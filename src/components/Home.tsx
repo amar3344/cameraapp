@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
-import { Text, View ,PermissionsAndroid, Alert} from 'react-native'
+import { Text, View , Alert, StyleSheet} from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import {check, RESULTS,PERMISSIONS } from 'react-native-permissions';
+import {check, RESULTS,PERMISSIONS, openSettings } from 'react-native-permissions';
+
+import IconCamera from 'react-native-vector-icons/Entypo';
+import Feather from "react-native-vector-icons/Feather";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 interface IProps{
     navigation?:{
-        navigate:(arg:string)=>void
+        navigate:(arg:string)=>void;
+        push:(arg:string)=>void;
     }
 }
 
@@ -18,14 +23,14 @@ export class Home extends Component<IProps> {
     }
 
     handleCameraScreen=async()=>{
-        check(PermissionsAndroid.PERMISSIONS.CAMERA)
+        check(PERMISSIONS.ANDROID.CAMERA)
         .then((result) => {
           switch (result) {
             case RESULTS.UNAVAILABLE:
               Alert.alert('This feature is not available (on this device / in this context)');
               break;
             case RESULTS.DENIED:
-              Alert.alert('The permission has not been requested / is denied but requestable');
+              openSettings()
               break;
             case RESULTS.LIMITED:
                 this.proceed()
@@ -43,18 +48,67 @@ export class Home extends Component<IProps> {
         });
     }
 
+    handleMapScreen=()=>{
+      this.props.navigation?.navigate("maps")
+    }
+
+    handlegalleryScreen=()=>{
+      this.props.navigation?.push("gallery")
+    }
+
+   
     render() {
     return (
-        <View>
-            <TouchableOpacity onPress={this.handleCameraScreen}>
-                <Text>Go to Camerea</Text>
+        <View style={styles.homeCont}>
+            <TouchableOpacity onPress={this.handleCameraScreen} style={styles.camera}>
+              <View style={{flexDirection:'row',alignItems:'center',}}>
+                <IconCamera name="camera" size={30} color={"#fff"} />
+                <Text style={styles.cameraText}>Camerea</Text>
+              </View>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.camera} onPress={this.handleMapScreen}>
+              <View style={{flexDirection:'row',alignItems:'center',}}>
+                <Feather name="map-pin" size={30} color={"#fff"}/>
+                <Text style={styles.cameraText}>Maps</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity  style={styles.camera} onPress={this.handlegalleryScreen}>
+              <View style={{flexDirection:'row',alignItems:'center',}}>
+                <AntDesign name="picture" color={"#fff"} size={30}/>
+                <Text style={styles.cameraText}>Gallery</Text>
+              </View>
+            </TouchableOpacity>
+            
         </View>
     )
   }
 }
 
 export default Home
+
+const styles = StyleSheet.create({
+
+  cameraText:{
+    fontSize:22,
+    fontFamily:'Roboto',
+    fontWeight:'600',
+    color:'#fff',
+    marginLeft:10,
+  },
+
+  camera:{
+    backgroundColor:'#901',
+    padding:15,
+    borderRadius:10,
+  },
+  homeCont:{
+    flex:1,
+    backgroundColor:'#355',
+    justifyContent:'center',
+    alignItems:'center',
+    gap:10,
+  },
+})
 
 // check(PERMISSIONS.IOS.LOCATION_ALWAYS)
 //   .then((result) => {

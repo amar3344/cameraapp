@@ -2,19 +2,24 @@ import React, { Component } from 'react'
 import { StyleSheet, View, Alert } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import Icon from 'react-native-vector-icons/dist/FontAwesome'
+import Icon from "react-native-vector-icons/dist/FontAwesome";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface IProps{
 
 }
 interface IState{
-    takingPic:boolean
+    takingPic:boolean,
+    imageUri:any,
 }
 
 class Camera extends Component<IProps,IState> {
 
-    state:IState = {takingPic:false}
+    state:IState = {takingPic:false,imageUri:[]}
+
     camera?: RNCamera | null
+    
 
     takePicture = async () => {
         if (this.camera && !this.state.takingPic) {
@@ -28,8 +33,11 @@ class Camera extends Component<IProps,IState> {
           this.setState({takingPic: true});
     
           try {
-             const data = await this.camera.takePictureAsync(options);
-             console.log('Success', JSON.stringify(data));
+            const data = await this.camera.takePictureAsync(options);
+            console.log(data)
+            this.setState(p=>({imageUri:[...p.imageUri,data]}))
+            await AsyncStorage.setItem("imageUrl",JSON.stringify(this.state.imageUri))
+
           } catch (err:any) {
             Alert.alert('Error', 'Failed to take picture: ' + (err.message || err));
             return;
